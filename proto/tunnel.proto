@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package tunnel;
+
+option go_package = "netconnector/proto/pb";
+
+// The core tunnel service connecting the reverse proxy to the local agent.
+service TunnelService {
+  // Bi-directional stream for multiplexing requests and responses
+  rpc TunnelStream (stream TunnelMessage) returns (stream TunnelMessage);
+}
+
+// Wrapper message to handle both handshake (Register) and ongoing HTTP traffic
+message TunnelMessage {
+  oneof payload {
+    RegisterRequest register_request = 1;
+    RegisterResponse register_response = 2;
+    HTTPRequest http_request = 3;
+    HTTPResponse http_response = 4;
+  }
+}
+
+// Handshake initiated by the client Local Agent
+message RegisterRequest {
+  string client_id = 1;
+}
+
+// Handshake response from the VPS Server
+message RegisterResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+// Encapsulated HTTP Request sent from VPS to Local Agent
+message HTTPRequest {
+  string request_id = 1;       // Unique UUIDv7 for the request
+  string method = 2;           // e.g., GET, POST
+  string url = 3;              // e.g., /api/users?query=1
+  map<string, HeaderList> headers = 4;
+  bytes body = 5;              // Payload, limited to max buffer size (~10MB)
+}
+
+// Encapsulated HTTP Response sent from Local Agent to VPS
+message HTTPResponse {
+  string request_id = 1;       // Matches the request_id of the HTTPRequest
+  int32 status_code = 2;       // HTTP Status Code (200, 404, 502, etc)
+  map<string, HeaderList> headers = 3;
+  bytes body = 4;
+}
+
+// Wrapper to support multiple values per HTTP header key
+message HeaderList {
+  repeated string values = 1;
+}

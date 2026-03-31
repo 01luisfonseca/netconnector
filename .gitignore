@@ -1,0 +1,32 @@
+# Binaries
+/bin/
+/release/
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# OS Files
+.DS_Store
+
+# IDE / Editor
+.idea/
+.vscode/
+
+# Build Artifacts
+*.test
+*.out
+cover.out
+
+# Protoc temporary items
+/.protoc/
+protoc.zip
