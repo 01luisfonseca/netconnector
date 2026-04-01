@@ -5,7 +5,7 @@
 # Environment Variables
 .env
 .env.*
-!.env.example
+!.env*.example
 
 # Logs
 *.log
@@ -30,3 +30,6 @@ cover.out
 # Protoc temporary items
 /.protoc/
 protoc.zip
+
+# Certificates
+/certs/

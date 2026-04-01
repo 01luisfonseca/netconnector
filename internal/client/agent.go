@@ -72,6 +72,11 @@ func (a *Agent) connectAndReceive(ctx context.Context, kacp keepalive.ClientPara
 	} else {
 		// Use TLS
 		tlsCAFile := os.Getenv("TLS_CA_FILE")
+		if tlsCAFile == "" {
+			if _, err := os.Stat("certs/ca.crt"); err == nil {
+				tlsCAFile = "certs/ca.crt"
+			}
+		}
 		if tlsCAFile != "" {
 			creds, err := credentials.NewClientTLSFromFile(tlsCAFile, "")
 			if err != nil {

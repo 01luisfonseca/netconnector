@@ -54,17 +54,35 @@ Para generar archivos listos para enviar a tu VPS o Raspberry Pi:
 # Generar ZIP para el Cliente (Agente + .env.example)
 make release-client
 
-# Generar ZIP para el Servidor (Bridge + Admin CLI)
+# Generar ZIP para el Servidor (Bridge + Admin CLI + .env.server.example)
 make release-server
 ```
 *El script detectará automáticamente tu sistema y te pedirá seleccionar la arquitectura de destino.*
 
+## 🔒 Gestión de Certificados (Seguridad)
+
+Netconnector incluye un sistema automatizado para gestionar TLS/SSL mediante una CA propia:
+
+```bash
+# 1. Generar certificados iniciales
+./scripts/generate-certs.sh
+
+# 2. Configurar renovación automática en Linux (Cron)
+./scripts/setup-cron.sh
+```
+*Esto configurará una tarea semanal para renovar el certificado del servidor antes de que expire.*
+
 ## Guía Rápida de Uso
 
 ### 1. Iniciar el Servidor VPS
+
+El servidor ahora soporta configuración vía `.env`. Copia el ejemplo:
 ```bash
-HTTP_PORT=8080 GRPC_PORT=50051 ./bin/server
+cp .env.server.example .env
+# Edita .env con tus puertos y rutas de DB/Certs
+./bin/server
 ```
+*(Opcionalmente sigue usando variables de entorno: `HTTP_PORT=8080 ./bin/server`)*
 
 ### 2. Registrar un Cliente (Vía Admin CLI)
 Asocia un subdominio (Host) a un ID de cliente específico:

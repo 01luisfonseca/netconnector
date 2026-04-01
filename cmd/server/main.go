@@ -10,6 +10,7 @@ import (
 
 	"netconnector/internal/server"
 	"netconnector/pkg/logger"
+	"github.com/joho/godotenv"
 	pb "netconnector/proto/pb"
 
 	"google.golang.org/grpc"
@@ -18,6 +19,11 @@ import (
 )
 
 func main() {
+	// Load .env file if it exists
+	if err := godotenv.Load(); err != nil {
+		logger.Debug("No .env file found, relying on environment variables")
+	}
+
 	// Simple config via ENV
 	grpcPort := os.Getenv("GRPC_PORT")
 	if grpcPort == "" {
@@ -62,7 +68,18 @@ func main() {
 	})
 
 	tlsCertFile := os.Getenv("TLS_CERT_FILE")
+	if tlsCertFile == "" {
+		if _, err := os.Stat("certs/server.crt"); err == nil {
+			tlsCertFile = "certs/server.crt"
+		}
+	}
+
 	tlsKeyFile := os.Getenv("TLS_KEY_FILE")
+	if tlsKeyFile == "" {
+		if _, err := os.Stat("certs/server.key"); err == nil {
+			tlsKeyFile = "certs/server.key"
+		}
+	}
 
 	var grpcServer *grpc.Server
 	if tlsCertFile != "" && tlsKeyFile != "" {
