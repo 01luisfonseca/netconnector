@@ -8,6 +8,21 @@ CERTS_DIR="$DIR/certs"
 mkdir -p "$CERTS_DIR"
 cd "$CERTS_DIR"
 
+IP_FILE=".server_ip"
+
+# 1. Si se pasa por variable de entorno, guardarla
+if [ -n "$SERVER_IP" ]; then
+    echo "$SERVER_IP" > "$IP_FILE"
+    echo "📍 IP del servidor establecida desde variable de entorno: $SERVER_IP"
+# 2. Si no, intentar leerla del archivo persistente
+elif [ -f "$IP_FILE" ]; then
+    SERVER_IP=$(cat "$IP_FILE")
+    echo "📖 IP del servidor cargada desde persistencia: $SERVER_IP"
+else
+    echo "⚠️ No se definió SERVER_IP y no existe archivo de persistencia ($IP_FILE)."
+    echo "💡 Se generará el certificado sin IP externa (solo localhost)."
+fi
+
 SERVER_CERT="server.crt"
 SERVER_KEY="server.key"
 CA_CERT="ca.crt"
@@ -58,6 +73,7 @@ subjectAltName = @alt_names
 [alt_names]
 DNS.1 = localhost
 IP.1 = 127.0.0.1
+$( [ -n "$SERVER_IP" ] && echo "IP.2 = $SERVER_IP" )
 EOF
 
     openssl x509 -req -in server.csr -CA $CA_CERT -CAkey $CA_KEY -CAcreateserial -out $SERVER_CERT -days $DAYS_VALID -extfile extfile.cnf

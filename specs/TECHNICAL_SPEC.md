@@ -60,10 +60,10 @@ Al iniciar la conexión `TunnelStream`, el cliente local debe enviar un mensaje 
 
 ### Encriptación gRPC (TLS con Autoridad Propia)
 El sistema soporta el despliegue de **certificados auto-firmados (CA propio)** para blindar el canal bidireccional contra ataques Man-in-the-Middle.
-- **Servidor:** Soporta carga de configuración vía archivo `.env` mediante `godotenv`. Lee las variables `TLS_CERT_FILE` y `TLS_KEY_FILE` al inicializar `grpc.NewServer()`. El sistema cuenta con un fallback automático que busca certificados en el directorio `./certs/` si las variables no están presentes.
+- **Servidor:** Soporta carga de configuración vía archivo `.env` mediante `godotenv`. Lee las variables `TLS_CERT_FILE` y `TLS_KEY_FILE` al inicializar `grpc.NewServer()`. El sistema cuenta con un fallback automático que busca certificados en el directorio `./certs/` si las variables no están presentes. **Nota:** El certificado del servidor incluye la IP pública como *Subject Alternative Name (SAN)* para permitir la validación de clientes remotos.
 - **Cliente:** Lee la variable `TLS_CA_FILE` (con fallback a `./certs/ca.crt`) para inyectar explícitamente la Autoridad Certificadora en el esquema de confianza de gRPC. Existe un flag seguro de evasión (`GRPC_INSECURE=true`) exclusivamente para debugging/desarrollo local.
 - **Herramientas de Ciclo de Vida:** 
   - `scripts/renew-ca.sh`: Verifica y renueva la CA raíz (Vence: 10 años / Renovación: 90 días antes).
-  - `scripts/renew-server-cert.sh`: Valida la autenticidad y vigencia del certificado del servidor (Vence: 1 año / Renovación: 30 días antes). Incluye lógica para disparar un comando de reinicio configurado tras la renovación.
+  - `scripts/renew-server-cert.sh`: Valida la autenticidad y vigencia del certificado del servidor (Vence: 1 año / Renovación: 30 días antes). Incluye lógica de **persistencia de IP**: lee la IP desde un archivo oculto (`certs/.server_ip`) si no se proporciona por variable de entorno, asegurando que las renovaciones automáticas mantengan el SAN correcto. También dispara el comando de reinicio configurado tras la renovación.
   - `scripts/setup-cron.sh`: Instala interactivamente una tarea en el `crontab` para ejecutar la lógica de renovación semanalmente cada domingo a las 3:00 AM.
-  - `scripts/generate-certs.sh`: Wrapper de primer uso que inicializa toda la cadena de confianza.
+  - `scripts/generate-certs.sh`: Wrapper de primer uso que inicializa toda la cadena de confianza. Permite pasar la IP del servidor como primer argumento para automatizar la configuración inicial del SAN.

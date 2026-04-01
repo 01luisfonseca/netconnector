@@ -7,6 +7,9 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 && pwd)"
 
 echo "Iniciando despliegue de certificados base..."
 
+# Capturar IP si se pasa como argumento
+[ -n "$1" ] && export SERVER_IP="$1"
+
 "$DIR/scripts/renew-ca.sh"
 "$DIR/scripts/renew-server-cert.sh"
 
