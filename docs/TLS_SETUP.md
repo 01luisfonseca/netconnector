@@ -15,8 +15,13 @@ Hemos preparado un script que automatiza la creación de una Autoridad Certifica
 1. Sitúate en la raíz del proyecto.
 2. Ejecuta el script:
    ```bash
+   # En desarrollo (fuente)
+   ./scripts/generate-certs.sh
+   
+   # En producción (release portátil)
    ./scripts/generate-certs.sh
    ```
+   *(El script está incluido en el paquete de release del servidor dentro de la carpeta `/scripts`).*
 3. Se creará una carpeta `/certs` con los siguientes archivos clave:
    - `ca.crt`: **[PÚBLICO]** Certificado Maestro que el Agente necesita para "confiar" en tu VPS.
    - `server.crt`: **[PÚBLICO]** Certificado del Servidor, firmado por el CA.
