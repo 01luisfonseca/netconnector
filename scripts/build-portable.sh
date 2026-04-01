@@ -96,7 +96,16 @@ if [ "$COMPONENT" == "client" ]; then
 else
     GOOS=$TARGET_OS GOARCH=$TARGET_ARCH go build -o "$TEMP_BUILD_DIR/server$BINARY_EXT" cmd/server/main.go
     GOOS=$TARGET_OS GOARCH=$TARGET_ARCH go build -o "$TEMP_BUILD_DIR/admin$BINARY_EXT" cmd/admin/main.go
-    echo -e "${GREEN}✅ Servidor y Admin CLI compilados${NC}"
+    
+    # Archivos adicionales para el servidor
+    cp "$PROJECT_ROOT/.env.server.example" "$TEMP_BUILD_DIR/.env.example"
+    mkdir -p "$TEMP_BUILD_DIR/scripts"
+    cp "$PROJECT_ROOT/scripts/generate-certs.sh" "$TEMP_BUILD_DIR/scripts/"
+    cp "$PROJECT_ROOT/scripts/renew-ca.sh" "$TEMP_BUILD_DIR/scripts/"
+    cp "$PROJECT_ROOT/scripts/renew-server-cert.sh" "$TEMP_BUILD_DIR/scripts/"
+    cp "$PROJECT_ROOT/scripts/setup-cron.sh" "$TEMP_BUILD_DIR/scripts/"
+    
+    echo -e "${GREEN}✅ Servidor, Admin CLI y scripts de mantenimiento incluidos${NC}"
 fi
 
 # 5. Crear el ZIP
