@@ -105,13 +105,17 @@ func (r *Router) RegisterClient(clientID string, stream pb.TunnelService_TunnelS
 	return ac, nil
 }
 
-func (r *Router) UnregisterClient(clientID string) {
+func (r *Router) UnregisterClient(clientID string, clientToUnregister *ActiveClient) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if _, exists := r.clients[clientID]; exists {
-		delete(r.clients, clientID)
-		logger.Info("Client unregistered", "client_id", clientID)
+	if currentClient, exists := r.clients[clientID]; exists {
+		if currentClient == clientToUnregister {
+			delete(r.clients, clientID)
+			logger.Info("Client unregistered", "client_id", clientID)
+		} else {
+			logger.Warn("Ignore unregister for client as a newer connection is registered", "client_id", clientID)
+		}
 	}
 }
 

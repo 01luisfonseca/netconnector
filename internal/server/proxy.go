@@ -46,6 +46,7 @@ func (h *ProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// 3. Check if Client is connected (in memory router)
 	client, err := h.router.GetClient(clientID)
 	if err != nil {
+		logger.Warn("Subdomain request failed: agent offline", "subdomain", subdomain, "client_id", clientID)
 		http.Error(w, "502 Bad Gateway: Local agent offline", http.StatusBadGateway)
 		return
 	}

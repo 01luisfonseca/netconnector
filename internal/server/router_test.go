@@ -15,5 +15,5 @@ func TestRouter_ResolveUnknownPromise(t *testing.T) {
 
 func TestRouter_UnregisterNonExistent(t *testing.T) {
 	router := NewRouter()
-	router.UnregisterClient("non-existent")
+	router.UnregisterClient("non-existent", nil)
 }

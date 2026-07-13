@@ -77,7 +77,7 @@ func (s *TunnelServer) TunnelStream(stream pb.TunnelService_TunnelStreamServer) 
 	}
 
 	// Make sure to unregister when the stream dies
-	defer s.router.UnregisterClient(clientID)
+	defer s.router.UnregisterClient(clientID, client)
 
 	// Acknowledge handshake
 	err = stream.Send(&pb.TunnelMessage{
